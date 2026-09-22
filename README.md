@@ -101,6 +101,25 @@ Set these in a `.env` file (loaded from the script's directory, so the CLI works
 
 By default, transcripts are saved to `transcript/<file-name>.txt`. The `transcript/` directory is gitignored — your transcripts stay local.
 
+## Tips
+
+Add an alias to your `~/.zshrc` (or `~/.bashrc`) to transcribe from anywhere without typing the full path:
+
+```bash
+# Transcribe an audio file to text with Workers AI (@cf/deepgram/nova-3)
+# @example: audioToText ./audio.mp3 [--max-minutes 2] [--out notes.txt]
+# Default output: ./transcript/<audio-name>.txt
+alias audioToText='node /path/to/cf-workers-ai-mp3-to-text/index.js'
+```
+
+Then reload your shell (`source ~/.zshrc`) and run:
+
+```bash
+audioToText meeting.mp3 --max-minutes 2
+```
+
+Thanks to the dotenv path handling, the alias works from any directory — `.env` is always loaded from the script's own folder.
+
 ## Notes
 
 - The CLI first tries sending raw binary audio; it falls back to base64-encoded JSON if the API returns HTTP 400.
