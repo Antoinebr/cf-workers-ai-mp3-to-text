@@ -1,0 +1,12 @@
+{
+  "name": "cf-workers-ai-mp3-to-text",
+  "version": "1.0.0",
+  "description": "Minimal CLI to transcribe MP3 files with Cloudflare Workers AI (@cf/deepgram/nova-3)",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
