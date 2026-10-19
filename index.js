@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import dotenv from "dotenv";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
-import { basename, dirname, extname, join, parse as parsePath } from "node:path";
+import { basename, dirname, extname, join, parse as parsePath, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
@@ -200,7 +200,7 @@ async function main() {
     const outFile = args.out ?? join("transcript", `${parsePath(args.file).name}.txt`);
     await mkdir(dirname(outFile), { recursive: true });
     await writeFile(outFile, transcript + "\n", "utf8");
-    console.log(`Saved to ${outFile}`);
+    console.log(`Saved to ${resolve(outFile)}`);
   } finally {
     if (tempFile) await rm(tempFile, { force: true });
   }
