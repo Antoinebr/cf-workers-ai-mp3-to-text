@@ -9,6 +9,8 @@ Features:
 - Punctuation, smart formatting, and paragraphs
 - Supports audio files (`.mp3`, `.m4a`, `.wav`, `.flac`, `.ogg`) and video files (`.mp4`, `.mov`, `.m4v`)
 - Optional truncation of MP3s for cheap tests (`--max-minutes`)
+- Audio duration, word count, and transcript coverage reporting, with a warning when a response looks truncated
+- `--raw-out` to dump the raw Workers AI response for debugging
 - Video audio extraction on macOS via built-in `afconvert` (no ffmpeg needed)
 
 ## Prerequisites
@@ -79,6 +81,12 @@ Custom output file:
 node index.js meeting.mp3 --out my-transcript.txt
 ```
 
+Save the raw API response for debugging:
+
+```bash
+node index.js meeting.mp3 --raw-out debug/raw.json
+```
+
 ### Options
 
 | Option            | Description                                                                     |
@@ -86,6 +94,7 @@ node index.js meeting.mp3 --out my-transcript.txt
 | `--lang <bcp-47>` | Language hint (default: `fr`). `detect_language` is also enabled.               |
 | `--max-minutes`   | Only send the first ~n minutes (128 kbps MP3 only). Useful for cheap tests.     |
 | `--out <file>`    | Output text file (default: `transcript/<file-name>.txt`)                        |
+| `--raw-out <file>`| Save the raw Workers AI JSON response for debugging                             |
 | `-h, --help`      | Show help                                                                       |
 
 ### Environment variables
@@ -100,6 +109,16 @@ Set these in a `.env` file (loaded from the script's directory, so the CLI works
 ## Output
 
 By default, transcripts are saved to `transcript/<file-name>.txt`. The `transcript/` directory is gitignored — your transcripts stay local.
+
+Alongside the transcript, the CLI logs the audio duration, request time, word count, last word timestamp, and a coverage ratio. It warns when the transcript appears to stop before the end of the audio.
+
+## Tests
+
+```bash
+npm test
+```
+
+The suite uses the built-in `node:test` runner and does not make network calls. It covers transcript extraction, payload/transport shape, and coverage reporting.
 
 ## Tips
 
@@ -122,5 +141,5 @@ Thanks to the dotenv path handling, the alias works from any directory — `.env
 
 ## Notes
 
-- The CLI first tries sending raw binary audio; it falls back to base64-encoded JSON if the API returns HTTP 400.
-- There is no test suite — this is a minimal single-file CLI.
+- The REST API expects raw binary audio with options as query parameters. The documented JSON payload (`audio: { body, contentType }`) is only supported by the Workers binding, not the REST endpoint, so there is no JSON fallback.
+- `@cf/deepgram/nova-3` is known to return incomplete transcripts for short audio (under ~150s). The CLI logs a coverage warning in that case; split longer audio into ~200s chunks if needed.
